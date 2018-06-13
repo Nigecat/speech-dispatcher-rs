@@ -68,26 +68,26 @@ fn i32_to_bool(v: i32) -> bool {
 
 impl Connection {
 
-    pub fn open(client_name: String, connection_name: String, user_name: String, mode: Mode) -> Connection {
+    pub fn open<S: Into<String>>(client_name: S, connection_name: S, user_name: S, mode: Mode) -> Connection {
         let connection = unsafe {
             spd_open(
-                CString::new(client_name).unwrap().as_ptr(),
-                CString::new(connection_name).unwrap().as_ptr(),
-                CString::new(user_name).unwrap().as_ptr(),
+                CString::new(client_name.into()).unwrap().as_ptr(),
+                CString::new(connection_name.into()).unwrap().as_ptr(),
+                CString::new(user_name.into()).unwrap().as_ptr(),
                 mode as u32
             )
         };
         Connection {connection: connection }
     }
 
-    pub fn open2(client_name: String, connection_name: String, user_name: String, mode: Mode, address: *mut Address, autospawn: bool) -> Connection {
+    pub fn open2<S: Into<String>>(client_name: S, connection_name: S, user_name: S, mode: Mode, address: *mut Address, autospawn: bool) -> Connection {
         let auto_spawn = if autospawn { 1 } else { 0 };
         let error_result = vec![CString::new("").unwrap().into_raw()].as_mut_ptr();
         let connection = unsafe {
             spd_open2(
-                CString::new(client_name).unwrap().as_ptr(),
-                CString::new(connection_name).unwrap().as_ptr(),
-                CString::new(user_name).unwrap().as_ptr(),
+                CString::new(client_name.into()).unwrap().as_ptr(),
+                CString::new(connection_name.into()).unwrap().as_ptr(),
+                CString::new(user_name.into()).unwrap().as_ptr(),
                 mode as u32,
                 address,
                 auto_spawn,
@@ -101,23 +101,23 @@ impl Connection {
         unsafe { spd_close(self.connection) };
     }
 
-    pub fn say(&self, priority: Priority, text: String) -> bool {
+    pub fn say<S: Into<String>>(&self, priority: Priority, text: S) -> bool {
         let v = unsafe {
             spd_say(
                 self.connection,
                 priority as u32,
-                CString::new(text).unwrap().as_ptr()
+                CString::new(text.into()).unwrap().as_ptr()
             )
         };
         i32_to_bool(v)
     }
 
-    pub fn sayf(&self, priority: Priority, format: String) -> bool {
+    pub fn sayf<S: Into<String>>(&self, priority: Priority, format: S) -> bool {
         let v = unsafe {
             spd_sayf(
                 self.connection,
                 priority as u32,
-                CString::new(format).unwrap().as_ptr()
+                CString::new(format.into()).unwrap().as_ptr()
             )
         };
         i32_to_bool(v)
@@ -183,23 +183,23 @@ impl Connection {
         i32_to_bool(v)
     }
 
-    pub fn key(&self, priority: Priority, key_name: String) -> bool {
+    pub fn key<S: Into<String>>(&self, priority: Priority, key_name: S) -> bool {
         let v = unsafe {
             spd_key(
                 self.connection,
                 priority as u32,
-                CString::new(key_name).unwrap().as_ptr()
+                CString::new(key_name.into()).unwrap().as_ptr()
             )
         };
         i32_to_bool(v)
     }
 
-    pub fn char(&self, priority: Priority, char: String) -> bool {
+    pub fn char<S: Into<String>>(&self, priority: Priority, char: S) -> bool {
         let v = unsafe {
             spd_char(
                 self.connection,
                 priority as u32,
-                CString::new(char).unwrap().as_ptr()
+                CString::new(char.into()).unwrap().as_ptr()
             )
         };
         i32_to_bool(v)
@@ -216,12 +216,12 @@ impl Connection {
         i32_to_bool(v)
     }
 
-    pub fn sound_icon(&self, priority: Priority, icon_name: String) -> bool {
+    pub fn sound_icon<S: Into<String>>(&self, priority: Priority, icon_name: S) -> bool {
         let v = unsafe {
             spd_char(
                 self.connection,
                 priority as u32,
-                CString::new(icon_name).unwrap().as_ptr()
+                CString::new(icon_name.into()).unwrap().as_ptr()
             )
         };
         i32_to_bool(v)
@@ -257,31 +257,31 @@ impl Connection {
         }
     }
 
-    pub fn set_synthesis_voice(&self, voice_name: String) -> bool {
+    pub fn set_synthesis_voice<S: Into<String>>(&self, voice_name: S) -> bool {
         let v = unsafe {
             spd_set_synthesis_voice(
                 self.connection,
-                CString::new(voice_name).unwrap().as_ptr()
+                CString::new(voice_name.into()).unwrap().as_ptr()
             )
         };
         i32_to_bool(v)
     }
 
-    pub fn set_synthesis_voice_all(&self, voice_name: String) -> bool {
+    pub fn set_synthesis_voice_all<S: Into<String>>(&self, voice_name: S) -> bool {
         let v = unsafe {
             spd_set_synthesis_voice_all(
                 self.connection,
-                CString::new(voice_name).unwrap().as_ptr()
+                CString::new(voice_name.into()).unwrap().as_ptr()
             )
         };
         i32_to_bool(v)
     }
 
-    pub fn set_synthesis_voice_uid(&self, voice_name: String, target_uid: u32) -> bool {
+    pub fn set_synthesis_voice_uid<S: Into<String>>(&self, voice_name: S, target_uid: u32) -> bool {
         let v = unsafe {
             spd_set_synthesis_voice_uid(
                 self.connection,
-                CString::new(voice_name).unwrap().as_ptr(),
+                CString::new(voice_name.into()).unwrap().as_ptr(),
                 target_uid
             )
         };
@@ -318,12 +318,12 @@ impl Connection {
         i32_to_bool(v)
     }
 
-    pub fn set_notification(&self, notification: Notification, state: String) -> bool {
+    pub fn set_notification<S: Into<String>>(&self, notification: Notification, state: S) -> bool {
         let v = unsafe {
             spd_set_notification(
                 self.connection,
                 notification as u32,
-                CString::new(state).unwrap().as_ptr()
+                CString::new(state.into()).unwrap().as_ptr()
             )
         };
         i32_to_bool(v)
@@ -434,31 +434,31 @@ impl Connection {
         i32_to_bool(v)
     }
 
-    pub fn set_language(&self, language: String) -> bool {
+    pub fn set_language<S: Into<String>>(&self, language: S) -> bool {
         let v = unsafe {
             spd_set_language(
                 self.connection,
-                CString::new(language).unwrap().as_ptr()
+                CString::new(language.into()).unwrap().as_ptr()
             )
         };
         i32_to_bool(v)
     }
 
-    pub fn set_language_all(&self, language: String) -> bool {
+    pub fn set_language_all<S: Into<String>>(&self, language: S) -> bool {
         let v = unsafe {
             spd_set_language_all(
                 self.connection,
-                CString::new(language).unwrap().as_ptr()
+                CString::new(language.into()).unwrap().as_ptr()
             )
         };
         i32_to_bool(v)
     }
 
-    pub fn set_language_uid(&self, language: String, target_uid: u32) -> bool {
+    pub fn set_language_uid<S: Into<String>>(&self, language: S, target_uid: u32) -> bool {
         let v = unsafe {
             spd_set_language_uid(
                 self.connection,
-                CString::new(language).unwrap().as_ptr(),
+                CString::new(language.into()).unwrap().as_ptr(),
                 target_uid
             )
         };
@@ -470,37 +470,36 @@ impl Connection {
         v.to_str().unwrap()
     }
 
-    pub fn set_output_module(&self, output_module: String) -> bool {
+    pub fn set_output_module<S: Into<String>>(&self, output_module: S) -> bool {
         let v = unsafe {
             spd_set_output_module(
                 self.connection,
-                CString::new(output_module).unwrap().as_ptr()
+                CString::new(output_module.into()).unwrap().as_ptr()
             )
         };
         i32_to_bool(v)
     }
 
-    pub fn set_output_module_all(&self, output_module: String) -> bool {
+    pub fn set_output_module_all<S: Into<String>>(&self, output_module: S) -> bool {
         let v = unsafe {
             spd_set_output_module_all(
                 self.connection,
-                CString::new(output_module).unwrap().as_ptr()
+                CString::new(output_module.into()).unwrap().as_ptr()
             )
         };
         i32_to_bool(v)
     }
 
-    pub fn set_output_module_uid(&self, output_module: String, target_uid: u32) -> bool {
+    pub fn set_output_module_uid<S: Into<String>>(&self, output_module: S, target_uid: u32) -> bool {
         let v = unsafe {
             spd_set_output_module_uid(
                 self.connection,
-                CString::new(output_module).unwrap().as_ptr(),
+                CString::new(output_module.into()).unwrap().as_ptr(),
                 target_uid
             )
         };
         i32_to_bool(v)
     }
-
 
 }
 
