@@ -64,24 +64,41 @@ pub enum CapitalLetters {
 }
 
 fn i32_to_bool(v: i32) -> bool {
-    if v == 1 { true } else { false }
+    if v == 1 {
+        true
+    } else {
+        false
+    }
 }
 
 impl Connection {
-
-    pub fn open<S: Into<String>>(client_name: S, connection_name: S, user_name: S, mode: Mode) -> Connection {
+    pub fn open<S: Into<String>>(
+        client_name: S,
+        connection_name: S,
+        user_name: S,
+        mode: Mode,
+    ) -> Connection {
         let connection = unsafe {
             spd_open(
                 CString::new(client_name.into()).unwrap().as_ptr(),
                 CString::new(connection_name.into()).unwrap().as_ptr(),
                 CString::new(user_name.into()).unwrap().as_ptr(),
-                mode as u32
+                mode as u32,
             )
         };
-        Connection {connection: connection }
+        Connection {
+            connection: connection,
+        }
     }
 
-    pub fn open2<S: Into<String>>(client_name: S, connection_name: S, user_name: S, mode: Mode, address: *mut Address, autospawn: bool) -> Connection {
+    pub fn open2<S: Into<String>>(
+        client_name: S,
+        connection_name: S,
+        user_name: S,
+        mode: Mode,
+        address: *mut Address,
+        autospawn: bool,
+    ) -> Connection {
         let auto_spawn = if autospawn { 1 } else { 0 };
         let error_result = vec![CString::new("").unwrap().into_raw()].as_mut_ptr();
         let connection = unsafe {
@@ -92,7 +109,7 @@ impl Connection {
                 mode as u32,
                 address,
                 auto_spawn,
-                error_result
+                error_result,
             )
         };
         Connection { connection }
@@ -107,7 +124,7 @@ impl Connection {
             spd_say(
                 self.connection,
                 priority as u32,
-                CString::new(text.into()).unwrap().as_ptr()
+                CString::new(text.into()).unwrap().as_ptr(),
             )
         };
         i32_to_bool(v)
@@ -118,7 +135,7 @@ impl Connection {
             spd_sayf(
                 self.connection,
                 priority as u32,
-                CString::new(format.into()).unwrap().as_ptr()
+                CString::new(format.into()).unwrap().as_ptr(),
             )
         };
         i32_to_bool(v)
@@ -189,7 +206,7 @@ impl Connection {
             spd_key(
                 self.connection,
                 priority as u32,
-                CString::new(key_name.into()).unwrap().as_ptr()
+                CString::new(key_name.into()).unwrap().as_ptr(),
             )
         };
         i32_to_bool(v)
@@ -200,20 +217,14 @@ impl Connection {
             spd_char(
                 self.connection,
                 priority as u32,
-                CString::new(char.into()).unwrap().as_ptr()
+                CString::new(char.into()).unwrap().as_ptr(),
             )
         };
         i32_to_bool(v)
     }
 
     pub fn wchar(&self, priority: Priority, wchar: i32) -> bool {
-        let v = unsafe {
-            spd_wchar(
-                self.connection,
-                priority as u32,
-                wchar,
-            )
-        };
+        let v = unsafe { spd_wchar(self.connection, priority as u32, wchar) };
         i32_to_bool(v)
     }
 
@@ -222,7 +233,7 @@ impl Connection {
             spd_char(
                 self.connection,
                 priority as u32,
-                CString::new(icon_name.into()).unwrap().as_ptr()
+                CString::new(icon_name.into()).unwrap().as_ptr(),
             )
         };
         i32_to_bool(v)
@@ -262,7 +273,7 @@ impl Connection {
         let v = unsafe {
             spd_set_synthesis_voice(
                 self.connection,
-                CString::new(voice_name.into()).unwrap().as_ptr()
+                CString::new(voice_name.into()).unwrap().as_ptr(),
             )
         };
         i32_to_bool(v)
@@ -272,7 +283,7 @@ impl Connection {
         let v = unsafe {
             spd_set_synthesis_voice_all(
                 self.connection,
-                CString::new(voice_name.into()).unwrap().as_ptr()
+                CString::new(voice_name.into()).unwrap().as_ptr(),
             )
         };
         i32_to_bool(v)
@@ -283,39 +294,24 @@ impl Connection {
             spd_set_synthesis_voice_uid(
                 self.connection,
                 CString::new(voice_name.into()).unwrap().as_ptr(),
-                target_uid
+                target_uid,
             )
         };
         i32_to_bool(v)
     }
 
     pub fn set_data_mode(&self, mode: DataMode) -> bool {
-        let v = unsafe {
-            spd_set_data_mode(
-                self.connection,
-                mode as u32
-            )
-        };
+        let v = unsafe { spd_set_data_mode(self.connection, mode as u32) };
         i32_to_bool(v)
     }
 
     pub fn set_notification_on(&self, notification: Notification) -> bool {
-        let v = unsafe {
-            spd_set_notification_on(
-                self.connection,
-                notification as u32
-            )
-        };
+        let v = unsafe { spd_set_notification_on(self.connection, notification as u32) };
         i32_to_bool(v)
     }
 
     pub fn set_notification_off(&self, notification: Notification) -> bool {
-        let v = unsafe {
-            spd_set_notification_off(
-                self.connection,
-                notification as u32
-            )
-        };
+        let v = unsafe { spd_set_notification_off(self.connection, notification as u32) };
         i32_to_bool(v)
     }
 
@@ -324,7 +320,7 @@ impl Connection {
             spd_set_notification(
                 self.connection,
                 notification as u32,
-                CString::new(state.into()).unwrap().as_ptr()
+                CString::new(state.into()).unwrap().as_ptr(),
             )
         };
         i32_to_bool(v)
@@ -412,25 +408,43 @@ impl Connection {
         i32_to_bool(v)
     }
 
-    pub fn set_capital_letters_uid(&self, capital_letters: CapitalLetters, target_uid: u32) -> bool {
-        let v = unsafe { spd_set_capital_letters_uid(self.connection, capital_letters as u32, target_uid) };
+    pub fn set_capital_letters_uid(
+        &self,
+        capital_letters: CapitalLetters,
+        target_uid: u32,
+    ) -> bool {
+        let v = unsafe {
+            spd_set_capital_letters_uid(self.connection, capital_letters as u32, target_uid)
+        };
         i32_to_bool(v)
     }
 
     pub fn set_spelling(&self, spelling: bool) -> bool {
-        let s = if spelling { SPDSpelling::SPD_SPELL_ON } else { SPDSpelling::SPD_SPELL_OFF };
+        let s = if spelling {
+            SPDSpelling::SPD_SPELL_ON
+        } else {
+            SPDSpelling::SPD_SPELL_OFF
+        };
         let v = unsafe { spd_set_spelling(self.connection, s) };
         i32_to_bool(v)
     }
 
     pub fn set_spelling_all(&self, spelling: bool) -> bool {
-        let s = if spelling { SPDSpelling::SPD_SPELL_ON } else { SPDSpelling::SPD_SPELL_OFF };
+        let s = if spelling {
+            SPDSpelling::SPD_SPELL_ON
+        } else {
+            SPDSpelling::SPD_SPELL_OFF
+        };
         let v = unsafe { spd_set_spelling_all(self.connection, s) };
         i32_to_bool(v)
     }
 
     pub fn set_spelling_uid(&self, spelling: bool, target_uid: u32) -> bool {
-        let s = if spelling { SPDSpelling::SPD_SPELL_ON } else { SPDSpelling::SPD_SPELL_OFF };
+        let s = if spelling {
+            SPDSpelling::SPD_SPELL_ON
+        } else {
+            SPDSpelling::SPD_SPELL_OFF
+        };
         let v = unsafe { spd_set_spelling_uid(self.connection, s, target_uid) };
         i32_to_bool(v)
     }
@@ -439,7 +453,7 @@ impl Connection {
         let v = unsafe {
             spd_set_language(
                 self.connection,
-                CString::new(language.into()).unwrap().as_ptr()
+                CString::new(language.into()).unwrap().as_ptr(),
             )
         };
         i32_to_bool(v)
@@ -449,7 +463,7 @@ impl Connection {
         let v = unsafe {
             spd_set_language_all(
                 self.connection,
-                CString::new(language.into()).unwrap().as_ptr()
+                CString::new(language.into()).unwrap().as_ptr(),
             )
         };
         i32_to_bool(v)
@@ -460,7 +474,7 @@ impl Connection {
             spd_set_language_uid(
                 self.connection,
                 CString::new(language.into()).unwrap().as_ptr(),
-                target_uid
+                target_uid,
             )
         };
         i32_to_bool(v)
@@ -475,7 +489,7 @@ impl Connection {
         let v = unsafe {
             spd_set_output_module(
                 self.connection,
-                CString::new(output_module.into()).unwrap().as_ptr()
+                CString::new(output_module.into()).unwrap().as_ptr(),
             )
         };
         i32_to_bool(v)
@@ -485,27 +499,29 @@ impl Connection {
         let v = unsafe {
             spd_set_output_module_all(
                 self.connection,
-                CString::new(output_module.into()).unwrap().as_ptr()
+                CString::new(output_module.into()).unwrap().as_ptr(),
             )
         };
         i32_to_bool(v)
     }
 
-    pub fn set_output_module_uid<S: Into<String>>(&self, output_module: S, target_uid: u32) -> bool {
+    pub fn set_output_module_uid<S: Into<String>>(
+        &self,
+        output_module: S,
+        target_uid: u32,
+    ) -> bool {
         let v = unsafe {
             spd_set_output_module_uid(
                 self.connection,
                 CString::new(output_module.into()).unwrap().as_ptr(),
-                target_uid
+                target_uid,
             )
         };
         i32_to_bool(v)
     }
-
 }
 
-unsafe impl Send for Connection {
-}
+unsafe impl Send for Connection {}
 
 impl Drop for Connection {
     fn drop(&mut self) {
