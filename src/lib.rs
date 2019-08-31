@@ -2,6 +2,7 @@
 extern crate speech_dispatcher_sys;
 
 use std::ffi::{CStr, CString};
+use std::marker::Send;
 
 use speech_dispatcher_sys::*;
 
@@ -501,6 +502,9 @@ impl Connection {
         i32_to_bool(v)
     }
 
+}
+
+unsafe impl Send for Connection {
 }
 
 impl Drop for Connection {
