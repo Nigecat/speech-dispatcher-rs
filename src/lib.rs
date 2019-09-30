@@ -176,7 +176,7 @@ impl Connection {
         i32_to_bool(v)
     }
 
-    pub fn ause_all(&self) -> bool {
+    pub fn pause_all(&self) -> bool {
         let v = unsafe { spd_pause_all(self.connection) };
         i32_to_bool(v)
     }
