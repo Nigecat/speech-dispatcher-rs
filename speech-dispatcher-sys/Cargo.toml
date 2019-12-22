@@ -1,0 +1,11 @@
+[package]
+name = "speech-dispatcher-sys"
+version = "0.4.0"
+authors = ["Nolan Darilek <nolan@thewordnerd.info>"]
+repository = "https://gitlab.com/ndarilek/speech-dispatcher-sys"
+description = "speech-dispatcher system bindings"
+license = "LGPL-2.1"
+
+[build-dependencies]
+bindgen = "0.51"
+gcc = "0.3"
