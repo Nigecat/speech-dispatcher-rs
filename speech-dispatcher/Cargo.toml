@@ -7,4 +7,4 @@ description = "Rusty interface to the speech-dispatcher speech synthesis library
 license = "LGPL-2.1"
 
 [dependencies]
-speech-dispatcher-sys = { version = "0.4.0", path = "../speech-dispatcher-sys" }
+speech-dispatcher-sys = { version = "0.4", path = "../speech-dispatcher-sys" }
