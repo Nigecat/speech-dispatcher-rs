@@ -118,13 +118,21 @@ impl Connection {
     }
 
     pub fn say<S: Into<String>>(&self, priority: Priority, text: S) -> bool {
-        let param = CString::new(text.into()).unwrap();
+        let text: String = text.into();
+        if text.is_empty() {
+            return true;
+        }
+        let param = CString::new(text).unwrap();
         let v = unsafe { spd_say(self.connection, priority as u32, param.as_ptr()) };
         i32_to_bool(v)
     }
 
     pub fn sayf<S: Into<String>>(&self, priority: Priority, format: S) -> bool {
-        let param = CString::new(format.into()).unwrap();
+        let format: String = format.into();
+        if format.is_empty() {
+            return true;
+        }
+        let param = CString::new(format).unwrap();
         let v = unsafe { spd_sayf(self.connection, priority as u32, param.as_ptr()) };
         i32_to_bool(v)
     }
