@@ -1,6 +1,6 @@
 [package]
 name = "speech-dispatcher"
-version = "0.4.2"
+version = "0.4.3"
 authors = ["Nolan Darilek <nolan@thewordnerd.info>"]
 repository = "https://gitlab.com/ndarilek/speech-dispatcher-rs"
 description = "Rusty interface to the speech-dispatcher speech synthesis library"
