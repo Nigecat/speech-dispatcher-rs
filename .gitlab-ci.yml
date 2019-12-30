@@ -19,7 +19,7 @@ publish:
   script:
   - cargo login $CARGO_TOKEN
   - cargo package --manifest-path speech-dispatcher-sys/Cargo.toml
-  - cargo publish --manifest-path speech-dispatcher-sys/Cargo.toml
+  - cargo publish --manifest-path speech-dispatcher-sys/Cargo.toml || true
   - cargo package --manifest-path speech-dispatcher/Cargo.toml
   - cargo publish --manifest-path speech-dispatcher/Cargo.toml
   only:
