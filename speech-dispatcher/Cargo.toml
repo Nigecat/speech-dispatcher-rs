@@ -1,10 +1,12 @@
 [package]
 name = "speech-dispatcher"
-version = "0.4.3"
+version = "0.5.0"
 authors = ["Nolan Darilek <nolan@thewordnerd.info>"]
 repository = "https://gitlab.com/ndarilek/speech-dispatcher-rs"
 description = "Rusty interface to the speech-dispatcher speech synthesis library"
 license = "LGPL-2.1"
+edition = "2018"
 
 [dependencies]
-speech-dispatcher-sys = { version = "0.4", path = "../speech-dispatcher-sys" }
+lazy_static = "1"
+speech-dispatcher-sys = { version = "0.5", path = "../speech-dispatcher-sys" }
