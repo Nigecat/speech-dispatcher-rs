@@ -6,8 +6,7 @@ stages:
 
 before_script:
   - apt-get update
-  - apt-get install -y libclang-3.9-dev libspeechd-dev
-  - export CPATH=/usr/lib/llvm-3.9/lib/clang/3.9.1/include/
+  - apt-get install -y libspeechd-dev llvm-dev libclang-dev clang
 
 test:
   stage: test
