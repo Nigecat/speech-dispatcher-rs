@@ -84,12 +84,12 @@ fn i32_to_bool(v: i32) -> bool {
 
 #[derive(Clone, Copy)]
 struct Callbacks {
-    begin: Option<fn(u64)>,
-    end: Option<fn(u64)>,
-    index_mark: Option<fn(u64, String)>,
-    cancel: Option<fn(u64)>,
-    pause: Option<fn(u64)>,
-    resume: Option<fn(u64)>,
+    begin: Option<fn(u64, u64)>,
+    end: Option<fn(u64, u64)>,
+    index_mark: Option<fn(u64, u64, String)>,
+    cancel: Option<fn(u64, u64)>,
+    pause: Option<fn(u64, u64)>,
+    resume: Option<fn(u64, u64)>,
 }
 
 impl Default for Callbacks {
@@ -131,7 +131,7 @@ unsafe extern "C" fn cb(msg_id: u64, client_id: u64, state: u32) {
             _ => panic!("Unknown notification type"),
         };
         if let Some(f) = f {
-            f(msg_id);
+            f(msg_id, client_id);
         }
     }
 }
@@ -149,7 +149,7 @@ unsafe extern "C" fn cb_im(msg_id: u64, client_id: u64, state: u32, index_mark: 
             _ => panic!("Unknown notification type"),
         };
         if let Some(f) = f {
-            f(msg_id, index_mark);
+            f(msg_id, client_id, index_mark);
         }
     }
 }
@@ -596,7 +596,7 @@ impl Connection {
         }
     }
 
-    pub fn on_begin(&self, f: Option<fn(u64)>) {
+    pub fn on_begin(&self, f: Option<fn(u64, u64)>) {
         if let Ok(mut cbs) = callbacks.lock() {
             let cb = cbs.get_mut(&self.1);
             if let Some(cb) = cb {
@@ -605,7 +605,7 @@ impl Connection {
         }
     }
 
-    pub fn on_end(&self, f: Option<fn(u64)>) {
+    pub fn on_end(&self, f: Option<fn(u64, u64)>) {
         if let Ok(mut cbs) = callbacks.lock() {
             let cb = cbs.get_mut(&self.1);
             if let Some(cb) = cb {
@@ -614,7 +614,7 @@ impl Connection {
         }
     }
 
-    pub fn on_cancel(&self, f: Option<fn(u64)>) {
+    pub fn on_cancel(&self, f: Option<fn(u64, u64)>) {
         if let Ok(mut cbs) = callbacks.lock() {
             let cb = cbs.get_mut(&self.1);
             if let Some(cb) = cb {
@@ -623,7 +623,7 @@ impl Connection {
         }
     }
 
-    pub fn on_pause(&self, f: Option<fn(u64)>) {
+    pub fn on_pause(&self, f: Option<fn(u64, u64)>) {
         if let Ok(mut cbs) = callbacks.lock() {
             let cb = cbs.get_mut(&self.1);
             if let Some(cb) = cb {
@@ -632,7 +632,7 @@ impl Connection {
         }
     }
 
-    pub fn on_resume(&self, f: Option<fn(u64)>) {
+    pub fn on_resume(&self, f: Option<fn(u64, u64)>) {
         if let Ok(mut cbs) = callbacks.lock() {
             let cb = cbs.get_mut(&self.1);
             if let Some(cb) = cb {
@@ -641,13 +641,17 @@ impl Connection {
         }
     }
 
-    pub fn on_index_mark(&self, f: Option<fn(u64, String)>) {
+    pub fn on_index_mark(&self, f: Option<fn(u64, u64, String)>) {
         if let Ok(mut cbs) = callbacks.lock() {
             let cb = cbs.get_mut(&self.1);
             if let Some(cb) = cb {
                 cb.index_mark = f;
             }
         }
+    }
+
+    pub fn client_id(&self) -> u64 {
+        self.1
     }
 }
 

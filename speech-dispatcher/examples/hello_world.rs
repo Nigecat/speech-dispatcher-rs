@@ -10,11 +10,19 @@ fn main() {
         "hello_world",
         Mode::Threaded,
     );
-    connection.on_begin(Some(|id| println!("Beginning {}", id)));
-    connection.on_end(Some(|id| println!("Ending {}", id)));
+    connection.on_begin(Some(|msg_id, client_id| {
+        println!("Beginning {} from {}", msg_id, client_id)
+    }));
+    connection.on_end(Some(|msg_id, client_id| {
+        println!("Ending {} from {}", msg_id, client_id)
+    }));
     connection.say(
         Priority::Important,
-        format!("Hello, world at rate {}.", connection.get_voice_rate()),
+        format!(
+            "Hello, world at rate {} from client {}.",
+            connection.get_voice_rate(),
+            connection.client_id()
+        ),
     );
     connection.set_voice_rate(100);
     connection.say(Priority::Important, "This is faster.");
