@@ -18,6 +18,7 @@ fn main() {
         .constified_enum_module("SPDSpelling")
         .use_core()
         .layout_tests(false)
-        .generate().unwrap()
+        .generate()
+        .unwrap()
         .write_to_file(Path::new(&out_dir).join("speech_dispatcher_sys.rs"));
 }
