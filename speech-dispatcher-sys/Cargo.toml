@@ -1,6 +1,6 @@
 [package]
 name = "speech-dispatcher-sys"
-version = "0.5.1"
+version = "0.5.2"
 authors = ["Nolan Darilek <nolan@thewordnerd.info>"]
 repository = "https://gitlab.com/ndarilek/speech-dispatcher-rs"
 description = "speech-dispatcher system bindings"
@@ -8,5 +8,6 @@ license = "LGPL-2.1"
 edition = "2018"
 
 [build-dependencies]
-bindgen = "0.54"
+
+bindgen = ">= 0.54"
 gcc = "0.3"
