@@ -1,5 +1,3 @@
-extern crate speech_dispatcher;
-
 use speech_dispatcher::*;
 use std::io;
 
@@ -10,12 +8,12 @@ fn main() {
         "hello_world",
         Mode::Threaded,
     );
-    connection.on_begin(Some(|msg_id, client_id| {
+    connection.on_begin(Some(Box::new(|msg_id, client_id| {
         println!("Beginning {} from {}", msg_id, client_id)
-    }));
-    connection.on_end(Some(|msg_id, client_id| {
+    })));
+    connection.on_end(Some(Box::new(|msg_id, client_id| {
         println!("Ending {} from {}", msg_id, client_id)
-    }));
+    })));
     connection.say(
         Priority::Important,
         format!(

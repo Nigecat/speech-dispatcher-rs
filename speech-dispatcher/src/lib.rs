@@ -82,28 +82,19 @@ fn i32_to_bool(v: i32) -> bool {
     v == 1
 }
 
-#[derive(Clone, Copy)]
+#[derive(Default)]
 struct Callbacks {
-    begin: Option<fn(u64, u64)>,
-    end: Option<fn(u64, u64)>,
-    index_mark: Option<fn(u64, u64, String)>,
-    cancel: Option<fn(u64, u64)>,
-    pause: Option<fn(u64, u64)>,
-    resume: Option<fn(u64, u64)>,
+    begin: Option<Box<dyn FnMut(u64, u64)>>,
+    end: Option<Box<dyn FnMut(u64, u64)>>,
+    index_mark: Option<Box<dyn FnMut(u64, u64, String)>>,
+    cancel: Option<Box<dyn FnMut(u64, u64)>>,
+    pause: Option<Box<dyn FnMut(u64, u64)>>,
+    resume: Option<Box<dyn FnMut(u64, u64)>>,
 }
 
-impl Default for Callbacks {
-    fn default() -> Self {
-        Callbacks {
-            begin: None,
-            end: None,
-            index_mark: None,
-            cancel: None,
-            pause: None,
-            resume: None,
-        }
-    }
-}
+unsafe impl Send for Callbacks {}
+
+unsafe impl Sync for Callbacks {}
 
 lazy_static! {
     static ref callbacks: Mutex<HashMap<u64, Callbacks>> = {
@@ -121,16 +112,16 @@ unsafe extern "C" fn cb(msg_id: u64, client_id: u64, state: u32) {
         SPDNotificationType_SPD_EVENT_RESUME => Notification::Resume,
         _ => panic!("Unknown notification received in callback: {}", state),
     };
-    if let Some(c) = callbacks.lock().unwrap().get(&client_id) {
+    if let Some(c) = callbacks.lock().unwrap().get_mut(&client_id) {
         let f = match state {
-            Notification::Begin => c.begin,
-            Notification::End => c.end,
-            Notification::Cancel => c.cancel,
-            Notification::Pause => c.pause,
-            Notification::Resume => c.resume,
+            Notification::Begin => &mut c.begin,
+            Notification::End => &mut c.end,
+            Notification::Cancel => &mut c.cancel,
+            Notification::Pause => &mut c.pause,
+            Notification::Resume => &mut c.resume,
             _ => panic!("Unknown notification type"),
         };
-        if let Some(f) = f {
+        if let Some(f) = f.as_mut() {
             f(msg_id, client_id);
         }
     }
@@ -143,12 +134,12 @@ unsafe extern "C" fn cb_im(msg_id: u64, client_id: u64, state: u32, index_mark: 
         SPDNotificationType_SPD_EVENT_INDEX_MARK => Notification::IndexMarks,
         _ => panic!("Unknown notification received in IM callback: {}", state),
     };
-    if let Some(c) = callbacks.lock().unwrap().get(&client_id) {
+    if let Some(c) = callbacks.lock().unwrap().get_mut(&client_id) {
         let f = match state {
-            Notification::IndexMarks => c.index_mark,
+            Notification::IndexMarks => &mut c.index_mark,
             _ => panic!("Unknown notification type"),
         };
-        if let Some(f) = f {
+        if let Some(f) = f.as_mut() {
             f(msg_id, client_id, index_mark);
         }
     }
@@ -240,12 +231,12 @@ impl Connection {
         unsafe { spd_close(self.0) };
     }
 
-    pub fn say<S: Into<String>>(&self, priority: Priority, text: S) -> Option<i32> {
+    pub fn say<S: Into<String>>(&self, priority: Priority, text: S) -> Option<u64> {
         let text: String = text.into();
         let param = CString::new(text).unwrap();
         let rv = unsafe { spd_say(self.0, priority as u32, param.as_ptr()) };
         if rv != -1 {
-            Some(rv)
+            Some(rv as u64)
         } else {
             None
         }
@@ -596,7 +587,7 @@ impl Connection {
         }
     }
 
-    pub fn on_begin(&self, f: Option<fn(u64, u64)>) {
+    pub fn on_begin(&self, f: Option<Box<dyn FnMut(u64, u64)>>) {
         if let Ok(mut cbs) = callbacks.lock() {
             let cb = cbs.get_mut(&self.1);
             if let Some(cb) = cb {
@@ -605,7 +596,7 @@ impl Connection {
         }
     }
 
-    pub fn on_end(&self, f: Option<fn(u64, u64)>) {
+    pub fn on_end(&self, f: Option<Box<dyn FnMut(u64, u64)>>) {
         if let Ok(mut cbs) = callbacks.lock() {
             let cb = cbs.get_mut(&self.1);
             if let Some(cb) = cb {
@@ -614,7 +605,7 @@ impl Connection {
         }
     }
 
-    pub fn on_cancel(&self, f: Option<fn(u64, u64)>) {
+    pub fn on_cancel(&self, f: Option<Box<dyn FnMut(u64, u64)>>) {
         if let Ok(mut cbs) = callbacks.lock() {
             let cb = cbs.get_mut(&self.1);
             if let Some(cb) = cb {
@@ -623,7 +614,7 @@ impl Connection {
         }
     }
 
-    pub fn on_pause(&self, f: Option<fn(u64, u64)>) {
+    pub fn on_pause(&self, f: Option<Box<dyn FnMut(u64, u64)>>) {
         if let Ok(mut cbs) = callbacks.lock() {
             let cb = cbs.get_mut(&self.1);
             if let Some(cb) = cb {
@@ -632,7 +623,7 @@ impl Connection {
         }
     }
 
-    pub fn on_resume(&self, f: Option<fn(u64, u64)>) {
+    pub fn on_resume(&self, f: Option<Box<dyn FnMut(u64, u64)>>) {
         if let Ok(mut cbs) = callbacks.lock() {
             let cb = cbs.get_mut(&self.1);
             if let Some(cb) = cb {
@@ -641,7 +632,7 @@ impl Connection {
         }
     }
 
-    pub fn on_index_mark(&self, f: Option<fn(u64, u64, String)>) {
+    pub fn on_index_mark(&self, f: Option<Box<dyn FnMut(u64, u64, String)>>) {
         if let Ok(mut cbs) = callbacks.lock() {
             let cb = cbs.get_mut(&self.1);
             if let Some(cb) = cb {
