@@ -217,7 +217,7 @@ impl Connection {
             if let Some(client_id) = client_id {
                 let client_id: Vec<&str> = client_id.split("-").collect();
                 if let Some(client_id) = client_id.get(1) {
-                    if let Some(client_id) = client_id.parse::<u64>().ok() {
+                    if let Ok(client_id) = client_id.parse::<u64>() {
                         self.1 = client_id;
                     }
                 }
